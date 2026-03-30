@@ -1,20 +1,29 @@
-# Environment variables
-.env
+# # Environment variables
+# .env
 
-# Python compiled files
+# # Python compiled files
+# *.pyc
+# __pycache__/
+
+# # Database
+# db.sqlite3
+
+# # Media and uploaded files
+# media/
+# photos/
+
+# # Virtual environment
+# venv/
+# env/
+
+# # VS Code
+# .vscode/
+
+.env
 *.pyc
 __pycache__/
-
-# Database
 db.sqlite3
-
-# Media and uploaded files
 media/
 photos/
-
-# Virtual environment
-venv/
-env/
-
-# VS Code
-.vscode/
+staticfiles_build/
+employee_photos/

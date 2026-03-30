@@ -1,0 +1,302 @@
+{% load static %}
+{% load employee_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'employees/e_style.css' %}?v=3">
+</head>
+<body>
+
+<aside>
+  <div class="logo">
+    <img src="{% static 'employees/images/logo.png' %}" alt="HR Portal" style="width: 140px; height: auto;">
+  </div>
+  <nav>
+    <a href="{% url 'employee_dashboard' emp.pk %}" class="active">Dashboard</a>
+    <a href="{% url 'add_employee' %}">Add Employee</a>
+    <a href="#">Payroll</a>
+    <a href="#">Attendance</a>
+    <a href="#">Settings</a>
+  </nav>
+</aside>
+
+<main>
+  <div class="page-header">
+    <h1>Welcome, {{ emp.first_name }} {{ emp.last_name }}</h1>
+  </div>
+
+  {% if messages %}
+  <ul class="messages">
+    {% for msg in messages %}
+    <li class="{{ msg.tags }}">{{ msg }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+ 
+  <div class="profile-row">
+    <div class="profile-photo-card">
+
+  <form action="{% url 'employee_dashboard' emp.pk %}" method="POST" enctype="multipart/form-data" style="width:100%; display:flex; flex-direction:column; align-items:center; gap:12px;">
+    {% csrf_token %}
+    <input type="hidden" name="section" value="photo">
+
+    <div class="avatar-circle">
+      {% if emp.photo %}
+        <img src="{{ emp.photo.url }}" alt="{{ emp.first_name }}">
+      {% else %}
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+      {% endif %}
+    </div>
+
+    <div class="efield" style="width:100%; margin-top:8px;">
+      <label>Change Photo</label>
+      <input type="file" name="photo" accept="image/*">
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width:100%; margin-top:8px;">
+      Update Photo
+    </button>
+  </form>
+
+  <div class="emp-name" style="margin-top:8px;">
+    <select class="user-dropdown" onchange="switchUser(this)">
+      {% for u in users %}
+        <option value="{{ u.pk }}" {% if u.pk == emp.pk %}selected{% endif %}>
+          {{ u.first_name|upper }} {{ u.last_name|upper }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+</div>
+
+    <div class="card" style="margin-bottom:0">
+      <input type="checkbox" class="edit-toggle" id="chk-emp">
+      <div class="card-title">
+        Employee Details
+        <label for="chk-emp" class="edit-btn">
+          <span class="lbl-edit">✎ Edit</span>
+          <span class="lbl-save">✎ Editing…</span>
+        </label>
+      </div>
+      <div class="card-body">
+        <div class="view-block">
+          <div class="field-grid">
+            <div class="field"><div class="field-label">Email ID</div><div class="field-value">{{ emp.email }}</div></div>
+            <div class="field"><div class="field-label">Phone Number</div><div class="field-value">{{ emp.phone|default:"—" }}</div></div>
+            <div class="field"><div class="field-label">Role</div><div class="field-value">{{ emp.role }}</div></div>
+            <div class="field"><div class="field-label">Department</div><div class="field-value">{{ emp.department|default:"—" }}</div></div>
+            <div class="field"><div class="field-label">Employment Type</div><div class="field-value">{{ emp.emp_type|default:"—" }}</div></div>
+            <div class="field"><div class="field-label">Join Date</div><div class="field-value">{{ emp.join_date|date:"d / m / Y" |default:"—"}}</div></div>
+          </div>
+        </div>
+        <div class="edit-block">
+          <form action="{% url 'employee_dashboard' emp.pk %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="section" value="employee">
+            <div class="edit-grid">
+              <div class="efield"><label>Email ID</label><input type="email" name="email" value="{{ emp.email }}"></div>
+              <div class="efield"><label>Phone Number</label><input type="tel" name="phone" value="{{ emp.phone }}"></div>
+              <div class="efield"><label>Role</label>
+                <select name="role">
+                  {% for r in "Software Developer,HR Manager,Designer,Accountant,Team Lead"|split:"," %}
+                  <option {% if emp.role == r %}selected{% endif %}>{{ r }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="efield"><label>Department</label>
+                <select name="department">
+                  {% for d in "Engineering,Human Resources,Finance,Marketing,Operations,Product Development"|split:"," %}
+                  <option {% if emp.department == d %}selected{% endif %}>{{ d }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="efield"><label>Employment Type</label>
+                <select name="emp_type">
+                  {% for t in "Full Time,Part Time,Contract,Internship"|split:"," %}
+                  <option {% if emp.emp_type == t %}selected{% endif %}>{{ t }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="efield"><label>Join Date</label><input type="date" name="join_date" value="{{ emp.join_date|date:'Y-m-d' }}"></div>
+            </div>
+            <div class="edit-actions">
+              <label for="chk-emp" class="cancel-lbl">Cancel</label>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="bottom-row">
+
+    
+    <div class="card">
+      <input type="checkbox" class="edit-toggle" id="chk-personal">
+      <div class="card-title">
+        Personal Details
+        <label for="chk-personal" class="edit-btn">
+          <span class="lbl-edit">✎ Edit</span>
+          <span class="lbl-save">✎ Editing…</span>
+        </label>
+      </div>
+      <div class="card-body">
+        <div class="view-block">
+          <div class="field-grid col-1">
+            <div class="field-grid" style="margin-bottom:16px;">
+              <div class="field"><div class="field-label">First Name</div><div class="field-value">{{ emp.first_name }}</div></div>
+              <div class="field"><div class="field-label">Last Name</div><div class="field-value">{{ emp.last_name }}</div></div>
+            </div>
+            <div class="field"><div class="field-label">Date of Birth</div><div class="field-value">{{ emp.dob|date:"d / m / Y"|default:"—" }}</div></div>
+            <div class="field"><div class="field-label">Gender</div><div class="field-value">{{ emp.gender|default:"—" }}</div></div>
+            <div class="field"><div class="field-label">Blood Group</div><div class="field-value">{{ emp.blood_group|default:"—" }}</div></div>
+            <div class="field"><div class="field-label">Address</div><div class="field-value">{{ emp.address|default:"—" }}</div></div>
+          </div>
+        </div>
+        <div class="edit-block">
+          <form action="{% url 'employee_dashboard' emp.pk %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="section" value="personal">
+            <div class="edit-grid col-1">
+              <div class="edit-grid" style="margin-bottom:4px;">
+                <div class="efield"><label>First Name</label><input type="text" name="first_name" value="{{ emp.first_name }}"></div>
+                <div class="efield"><label>Last Name</label><input type="text" name="last_name" value="{{ emp.last_name }}"></div>
+              </div>
+              <div class="efield"><label>Date of Birth</label><input type="date" name="dob" value="{{ emp.dob|date:'Y-m-d' }}"></div>
+              <div class="efield"><label>Gender</label>
+                <select name="gender">
+                  {% for g in "Male,Female,Other"|split:"," %}
+                  <option {% if emp.gender == g %}selected{% endif %}>{{ g }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="efield"><label>Blood Group</label>
+                <select name="blood_group">
+                  {% for bg in "A+,A-,B+,B-,O+,O-,AB+,AB-"|split:"," %}
+                  <option {% if emp.blood_group == bg %}selected{% endif %}>{{ bg }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="efield"><label>Address</label><textarea name="address">{{ emp.address }}</textarea></div>
+            </div>
+            <div class="edit-actions">
+              <label for="chk-personal" class="cancel-lbl">Cancel</label>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="card">
+      <input type="checkbox" class="edit-toggle" id="chk-add">
+      <div class="card-title">
+        Additional Information
+        <label for="chk-add" class="edit-btn">
+          <span class="lbl-edit">✎ Edit</span>
+          <span class="lbl-save">✎ Editing…</span>
+        </label>
+      </div>
+      <div class="card-body">
+        <div class="view-block">
+          <div class="field-grid col-1">
+            <div class="field"><div class="field-label">Education</div><div class="field-value">{{ emp.education|default:"—" }}</div></div>
+            <div class="field">
+              <div class="field-label">Skills</div>
+              <div class="tags">
+                {% for s in skills_list %}<span class="tag">{{ s }}</span>{% empty %}<span style="color:var(--muted)">—</span>{% endfor %}
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-label">Hobbies</div>
+              <div class="tags">
+                {% for h in hobbies_list %}<span class="tag">{{ h }}</span>{% empty %}<span style="color:var(--muted)">—</span>{% endfor %}
+              </div>
+            </div>
+            <div class="field"><div class="field-label">Bio Tag</div><div class="field-value">{{ emp.biotag|default:"—" }}</div></div>
+          </div>
+        </div>
+        <div class="edit-block">
+          <form action="{% url 'employee_dashboard' emp.pk %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="section" value="additional">
+            <div class="edit-grid col-1">
+              <div class="efield"><label>Education</label><input type="text" name="education" value="{{ emp.education }}"></div>
+              <div class="efield"><label>Skills <small style="text-transform:none;font-weight:400;letter-spacing:0">(comma separated)</small></label><input type="text" name="skills" value="{{ emp.skills }}"></div>
+              <div class="efield"><label>Hobbies <small style="text-transform:none;font-weight:400;letter-spacing:0">(comma separated)</small></label><input type="text" name="hobbies" value="{{ emp.hobbies }}"></div>
+              <div class="efield"><label>Bio Tag</label><input type="text" name="biotag" value="{{ emp.biotag }}"></div>
+            </div>
+            <div class="edit-actions">
+              <label for="chk-add" class="cancel-lbl">Cancel</label>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <input type="checkbox" class="edit-toggle" id="chk-ec">
+    <div class="card-title">
+      Emergency Contact
+      <label for="chk-ec" class="edit-btn">
+        <span class="lbl-edit">✎ Edit</span>
+        <span class="lbl-save">✎ Editing…</span>
+      </label>
+    </div>
+    <div class="card-body">
+      <div class="view-block">
+        <div class="field-grid">
+          <div class="field"><div class="field-label">Contact Name</div><div class="field-value">{{ emp.ec_name }}</div></div>
+          <div class="field"><div class="field-label">Relationship</div><div class="field-value">{{ emp.ec_relation }}</div></div>
+          <div class="field"><div class="field-label">Phone Number</div><div class="field-value">{{ emp.ec_phone |default:"—" }}</div></div>
+          <div class="field"><div class="field-label">Alternate Phone</div><div class="field-value">{{ emp.ec_alt_phone|default:"—" }}</div></div>
+        </div>
+      </div>
+      <div class="edit-block">
+        <form action="{% url 'employee_dashboard' emp.pk %}" method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="section" value="emergency">
+          <div class="edit-grid">
+            <div class="efield"><label>Contact Name</label><input type="text" name="ec_name" value="{{ emp.ec_name }}"></div>
+            <div class="efield"><label>Relationship</label>
+              <select name="ec_relation">
+                {% for rel in "Spouse,Parent,Sibling,Friend,Other"|split:"," %}
+                <option {% if emp.ec_relation == rel %}selected{% endif %}>{{ rel }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="efield"><label>Phone Number</label><input type="tel" name="ec_phone" value="{{ emp.ec_phone }}"></div>
+            <div class="efield"><label>Alternate Phone</label><input type="tel" name="ec_alt_phone" value="{{ emp.ec_alt_phone }}"></div>
+          </div>
+          <div class="edit-actions">
+            <label for="chk-ec" class="cancel-lbl">Cancel</label>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+function switchUser(select) {
+    var userId = select.value;
+    window.location.href = "/employee/" + userId + "/";
+}
+</script>
+
+</body>
+</html>

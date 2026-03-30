@@ -41,8 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
     # 'blog',
     'cloudinary',
     'employees',
@@ -137,9 +137,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')  
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build')
+# STATIC_URL = 'static/'
+# # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')  
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build')
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'employees', 'static')]
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'employees', 'static'),
+]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # MEDIA_URL = '/media/'

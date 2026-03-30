@@ -2,4 +2,5 @@
 
 pip install --break-system-packages -r requirements.txt
 python manage.py collectstatic --noinput --clear
-mkdir -p staticfiles_build
+echo "Static files collected"
+ls staticfiles_build

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Employee
 import cloudinary
+import os
 
 def employee_dashboard(request, pk=None):
     employees = Employee.objects.all()
@@ -63,6 +64,9 @@ def employee_dashboard(request, pk=None):
 
 
 def add_employee(request):
+    print("CLOUD_NAME:", os.environ.get('CLOUDINARY_CLOUD_NAME'))
+    print("API_KEY:", os.environ.get('CLOUDINARY_API_KEY'))
+    print("DEFAULT_FILE_STORAGE:", os.environ.get('DEFAULT_FILE_STORAGE'))
     print("CLOUD NAME:", cloudinary.config().cloud_name)
 
     if request.method == 'POST':

@@ -48,7 +48,9 @@ def employee_dashboard(request, pk=None):
 
         elif section == 'photo':
             if request.FILES.get('photo'):
-                emp.photo = request.FILES['photo']
+                file = request.FILES['photo']
+                upload = cloudinary.uploader.upload(file, folder='employee_photos')
+                emp.photo = upload['secure_url']
 
         emp.save()
         messages.success(request, 'Changes saved successfully.')
@@ -93,7 +95,9 @@ def add_employee(request):
             ec_alt_phone= request.POST.get('ec_alt_phone', ''),
         )
         if request.FILES.get('photo'):
-            emp.photo = request.FILES['photo']
+            file = request.FILES['photo']
+            upload = cloudinary.uploader.upload(file, folder='employee_photos')
+            emp.photo = upload['secure_url']
         emp.save()
         messages.success(request, f'Employee {emp.first_name} added successfully!')
         return redirect('employee_dashboard', pk=emp.pk)
